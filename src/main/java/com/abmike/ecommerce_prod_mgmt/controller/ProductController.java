@@ -8,7 +8,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
@@ -60,5 +62,22 @@ public class ProductController {
     @GetMapping("/category/{categoryId}")
     public Page<Product> getProductsByCategory(@PathVariable Long categoryId, Pageable pageable) {
         return productService.getProductsByCategory(categoryId, pageable);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Product> partialUpdateProduct(@PathVariable Long id, @RequestBody Product partialProduct) {
+        return productService.partialUpdateProduct(id, partialProduct)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/price-range")
+    public List<Product> getProductsInPriceRange(@RequestParam BigDecimal minPrice, @RequestParam BigDecimal maxPrice) {
+        return productService.getProductsInPriceRange(minPrice, maxPrice);
+    }
+
+    @GetMapping("/count-by-category")
+    public Map<String, Long> getProductCountByCategory() {
+        return productService.getProductCountByCategory();
     }
 }

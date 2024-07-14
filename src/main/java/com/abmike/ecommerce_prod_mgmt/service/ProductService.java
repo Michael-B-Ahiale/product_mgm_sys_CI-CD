@@ -7,7 +7,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -54,5 +58,36 @@ public class ProductService {
 
     public Page<Product> getProductsByCategory(Long categoryId, Pageable pageable) {
         return productRepository.findByCategoryId(categoryId, pageable);
+    }
+
+    public Optional<Product> partialUpdateProduct(Long id, Product partialProduct) {
+        return productRepository.findById(id)
+                .map(existingProduct -> {
+                    if (partialProduct.getName() != null) {
+                        existingProduct.setName(partialProduct.getName());
+                    }
+                    if (partialProduct.getDescription() != null) {
+                        existingProduct.setDescription(partialProduct.getDescription());
+                    }
+                    if (partialProduct.getPrice() != null) {
+                        existingProduct.setPrice(partialProduct.getPrice());
+                    }
+                    if (partialProduct.getCategory() != null) {
+                        existingProduct.setCategory(partialProduct.getCategory());
+                    }
+                    return productRepository.save(existingProduct);
+                });
+    }
+
+    public List<Product> getProductsInPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
+        return productRepository.findProductsInPriceRange(minPrice, maxPrice);
+    }
+
+    public Map<String, Long> getProductCountByCategory() {
+        return productRepository.countProductsByCategory().stream()
+                .collect(Collectors.toMap(
+                        row -> (String) row[0],
+                        row -> (Long) row[1]
+                ));
     }
 }
