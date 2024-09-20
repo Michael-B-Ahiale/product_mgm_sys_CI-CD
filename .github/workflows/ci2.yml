@@ -10,21 +10,55 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      db:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: mike
+          MYSQL_DATABASE: ecommerce_prod_mgmt
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
     - uses: actions/checkout@v4
+
     - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
         java-version: '21'
         distribution: 'temurin'
+
     - name: Build with Maven
-      run: mvn clean test
+      run: mvn clean package
+
+    - name: Start Application
+      run: |
+        nohup java -jar target/your-application.jar &
+        # Replace 'your-application.jar' with the actual jar file name
+
+    - name: Wait for Application to Start
+      run: |
+        sleep 30 # Adjust the time if needed to ensure the app is fully up
+
+    - name: Run Tests
+      env:
+        SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/ecommerce_prod_mgmt
+        SPRING_DATASOURCE_USERNAME: root
+        SPRING_DATASOURCE_PASSWORD: mike
+      run: mvn test
+
     - name: Publish Test Report
       uses: actions/upload-artifact@v4
       if: success() || failure()
       with:
         name: test-report
         path: target/surefire-reports
+
     - name: Slack Notification
       uses: 8398a7/action-slack@v3
       with:
