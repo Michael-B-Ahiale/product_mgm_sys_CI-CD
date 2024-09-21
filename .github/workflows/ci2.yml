@@ -36,12 +36,22 @@ jobs:
     - name: Build with Maven
       run: mvn clean package -DskipTests
 
+    - name: Start Spring Boot Application
+      run: |
+        nohup java -jar target/ecommerce_prod_mgmt-0.0.1-SNAPSHOT.jar &
+        echo $! > .pid
+        sleep 30
+
     - name: Run Tests
       env:
         SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/ecommerce_prod_mgmt
         SPRING_DATASOURCE_USERNAME: root
         SPRING_DATASOURCE_PASSWORD: mike
       run: mvn test
+
+    - name: Stop Spring Boot Application
+      if: always()
+      run: kill $(cat .pid)
 
     - name: Publish Test Report
       uses: actions/upload-artifact@v4
