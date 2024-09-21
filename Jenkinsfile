@@ -4,44 +4,26 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the code from GitHub
                 git url: 'https://github.com/Michael-B-Ahiale/product_mgm_sys_CI-CD.git', branch: 'main'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                // Use Maven to install dependencies
-                sh 'mvn clean install'
+                // Use Maven to install dependencies (on Windows, use 'bat')
+                bat 'mvn clean install'
             }
         }
 
         stage('Run Tests') {
             steps {
-                // Run tests with Maven
-                sh 'mvn test'
+                // Run tests with Maven (on Windows, use 'bat')
+                bat 'mvn test'
             }
             post {
                 always {
-                    // Publish test results even if the build fails
                     junit '**/target/surefire-reports/*.xml'
                 }
-            }
-        }
-
-        stage('Report Results') {
-            steps {
-                // Publish JUnit or HTML test reports (depending on your test setup)
-                junit '**/target/surefire-reports/*.xml'
-                // Optionally, publish HTML reports
-                publishHTML(target: [
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: 'target/site',
-                    reportFiles: 'index.html',
-                    reportName: 'HTML Report'
-                ])
             }
         }
     }
