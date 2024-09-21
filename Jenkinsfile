@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'Maven 3.9.9'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -10,14 +14,12 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                // Use Maven to install dependencies (on Windows, use 'bat')
-                bat 'mvn clean install'
+                bat 'mvn clean install -DskipTests'
             }
         }
 
         stage('Run Tests') {
             steps {
-                // Run tests with Maven (on Windows, use 'bat')
                 bat 'mvn test'
             }
             post {
@@ -30,14 +32,10 @@ pipeline {
 
     post {
         success {
-            mail to: 'abmike268@gmail.com',
-                 subject: "Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                 body: "Good news, the build passed! Check the results at ${env.BUILD_URL}."
+            echo 'Build successful!'
         }
         failure {
-            mail to: 'abmike268@gmail.com',
-                 subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                 body: "Unfortunately, the build failed. Check the details at ${env.BUILD_URL}."
+            echo 'Build failed!'
         }
     }
 }
