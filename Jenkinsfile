@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout the code from GitHub
-                git url: 'https://github.com/your-username/your-repo.git', branch: 'main'
+                git url: 'https://github.com/Michael-B-Ahiale/product_mgm_sys_CI-CD.git', branch: 'main'
             }
         }
 
@@ -48,12 +48,12 @@ pipeline {
 
     post {
         success {
-            mail to: 'team@example.com',
+            mail to: 'abmike268@gmail.com',
                  subject: "Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                  body: "Good news, the build passed! Check the results at ${env.BUILD_URL}."
         }
         failure {
-            mail to: 'team@example.com',
+            mail to: 'abmike268@gmail.com',
                  subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                  body: "Unfortunately, the build failed. Check the details at ${env.BUILD_URL}."
         }
