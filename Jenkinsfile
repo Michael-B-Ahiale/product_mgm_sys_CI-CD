@@ -12,36 +12,33 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Build and Test') {
             steps {
-                bat 'mvn clean install -DskipTests'
+                bat 'mvn clean test'
             }
         }
 
-        stage('Run Tests') {
+        stage('Generate Reports') {
             steps {
-                bat 'mvn test'
-            }
-            post {
-                always {
-                    junit '**/target/surefire-reports/*.xml'
-
-                    // Generate and archive HTML report
-                    bat 'mvn surefire-report:report-only'
-                    publishHTML(target: [
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: false,
-                        keepAll: true,
-                        reportDir: 'target/site',
-                        reportFiles: 'surefire-report.html',
-                        reportName: 'HTML Report'
-                    ])
-                }
+                bat 'mvn surefire-report:report-only'
+                bat 'mvn site -DgenerateReports=false'
             }
         }
     }
 
     post {
+        always {
+            junit '**/target/surefire-reports/*.xml'
+
+            publishHTML(target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: false,
+                keepAll: true,
+                reportDir: 'target/site',
+                reportFiles: 'surefire-report.html',
+                reportName: 'HTML Test Report'
+            ])
+        }
         success {
             echo 'Build successful!'
         }
