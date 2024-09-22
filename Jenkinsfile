@@ -25,6 +25,17 @@ pipeline {
             post {
                 always {
                     junit '**/target/surefire-reports/*.xml'
+
+                    // Generate and archive HTML report
+                    bat 'mvn surefire-report:report-only'
+                    publishHTML(target: [
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: false,
+                        keepAll: true,
+                        reportDir: 'target/site',
+                        reportFiles: 'surefire-report.html',
+                        reportName: 'HTML Report'
+                    ])
                 }
             }
         }
