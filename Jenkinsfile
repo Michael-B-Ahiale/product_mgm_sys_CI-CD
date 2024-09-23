@@ -21,7 +21,7 @@ pipeline {
         stage('Generate Reports') {
             steps {
                 bat 'mvn surefire-report:report-only'
-                bat 'mvn site -DgenerateReports=false'
+                bat 'mvn site'
             }
         }
     }
