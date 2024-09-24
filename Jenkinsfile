@@ -24,8 +24,8 @@ pipeline {
 
         stage('Generate Reports') {
             steps {
-                bat 'mvn surefire-report:report'
-                bat 'mvn site'
+                bat 'mvn surefire-report:report-only'
+                bat 'mvn site -DgenerateReports=false'
 
                 // Generate enhanced XML report for API testing
                 script {
@@ -68,7 +68,7 @@ pipeline {
                     </api-test-report>
                     """
 
-                    writeFile file: 'api-test-report.xml', text: xmlReport
+                    writeFile file: "${env.WORKSPACE}/api-test-report.xml", text: xmlReport
                 }
             }
         }
@@ -108,7 +108,7 @@ pipeline {
                     <p>View <a href='${env.BUILD_URL}HTML_20Test_20Report/'>HTML Test Report</a></p>
                     <p>A detailed XML report of the API tests is attached to this email.</p>""",
                     to: 'abmike268@gmail.com',
-                    attachmentsPattern: 'api-test-report.xml, target/site/surefire-report.html',
+                    attachmentsPattern: "${env.WORKSPACE}/api-test-report.xml, ${env.WORKSPACE}/target/site/surefire-report.html",
                     mimeType: 'text/html'
                 )
             }
@@ -134,7 +134,7 @@ pipeline {
                     <p>View <a href='${env.BUILD_URL}HTML_20Test_20Report/'>HTML Test Report</a></p>
                     <p>A detailed XML report of the API tests is attached to this email.</p>""",
                     to: 'abmike268@gmail.com',
-                    attachmentsPattern: 'api-test-report.xml, target/site/surefire-report.html',
+                    attachmentsPattern: "${env.WORKSPACE}/api-test-report.xml, ${env.WORKSPACE}/target/site/surefire-report.html",
                     mimeType: 'text/html'
                 )
             }
