@@ -29,7 +29,7 @@ pipeline {
 
                 // Generate enhanced XML report for API testing
                 script {
-                    def testResults = junit '**/target/surefire-reports/*.xml'
+                    def testResults = junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
 
                     def xmlReport = """<?xml version="1.0" encoding="UTF-8"?>
                     <api-test-report>
@@ -48,17 +48,19 @@ pipeline {
                         <test-cases>
                     """
 
-                    testResults.each { test ->
-                        xmlReport += """
-                            <test-case>
-                                <name>${test.name}</name>
-                                <class-name>${test.className}</class-name>
-                                <duration>${test.duration}</duration>
-                                <status>${test.status}</status>
-                                ${test.errorDetails ? "<error-details>${test.errorDetails}</error-details>" : ""}
-                                ${test.errorStackTrace ? "<error-stack-trace>${test.errorStackTrace}</error-stack-trace>" : ""}
-                            </test-case>
-                        """
+                    testResults.each { suite ->
+                        suite.cases.each { testCase ->
+                            xmlReport += """
+                                <test-case>
+                                    <name>${testCase.name}</name>
+                                    <class-name>${testCase.className}</class-name>
+                                    <duration>${testCase.duration}</duration>
+                                    <status>${testCase.status}</status>
+                                    ${testCase.errorDetails ? "<error-details>${testCase.errorDetails}</error-details>" : ""}
+                                    ${testCase.errorStackTrace ? "<error-stack-trace>${testCase.errorStackTrace}</error-stack-trace>" : ""}
+                                </test-case>
+                            """
+                        }
                     }
 
                     xmlReport += """
@@ -74,7 +76,7 @@ pipeline {
 
     post {
         always {
-            junit '**/target/surefire-reports/*.xml'
+            junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
 
             publishHTML(target: [
                 allowMissing: false,
@@ -106,17 +108,8 @@ pipeline {
                     <p>View <a href='${env.BUILD_URL}HTML_20Test_20Report/'>HTML Test Report</a></p>
                     <p>A detailed XML report of the API tests is attached to this email.</p>""",
                     to: 'abmike268@gmail.com',
-                    from: 'abmike268@gmail.com',
-                    replyTo: 'abmike268@gmail.com',
-                    mimeType: 'text/html',
-                    attachmentsPattern: '**/api-test-report.xml, **/target/site/surefire-report.html',
-                    compressLog: true,
-                    auth: true,
-                    smtpServer: 'smtp.gmail.com',
-                    smtpPort: '465',
-                    useSsl: true,
-                    username: '$SMTP_CREDS_USR',
-                    password: '$SMTP_CREDS_PSW'
+                    attachmentsPattern: 'api-test-report.xml, target/site/surefire-report.html',
+                    mimeType: 'text/html'
                 )
             }
         }
@@ -141,17 +134,8 @@ pipeline {
                     <p>View <a href='${env.BUILD_URL}HTML_20Test_20Report/'>HTML Test Report</a></p>
                     <p>A detailed XML report of the API tests is attached to this email.</p>""",
                     to: 'abmike268@gmail.com',
-                    from: 'abmike268@gmail.com',
-                    replyTo: 'abmike268@gmail.com',
-                    mimeType: 'text/html',
-                    attachmentsPattern: '**/api-test-report.xml, **/target/site/surefire-report.html',
-                    compressLog: true,
-                    auth: true,
-                    smtpServer: 'smtp.gmail.com',
-                    smtpPort: '465',
-                    useSsl: true,
-                    username: '$SMTP_CREDS_USR',
-                    password: '$SMTP_CREDS_PSW'
+                    attachmentsPattern: 'api-test-report.xml, target/site/surefire-report.html',
+                    mimeType: 'text/html'
                 )
             }
         }
