@@ -88,7 +88,7 @@ pipeline {
             ])
         }
         success {
-            echo 'Build successful'
+            echo 'Build successful!'
             script {
                 emailext (
                     subject: "SUCCESS: API Tests for '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
