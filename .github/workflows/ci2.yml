@@ -14,7 +14,7 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: mike
+          MYSQL_ROOT_PASSWORD: ${{ secrets.SQL_PASSWORD }}
           MYSQL_DATABASE: ecommerce_prod_mgmt
         ports:
           - 3306:3306
@@ -46,7 +46,7 @@ jobs:
       env:
         SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/ecommerce_prod_mgmt
         SPRING_DATASOURCE_USERNAME: root
-        SPRING_DATASOURCE_PASSWORD: mike
+        SPRING_DATASOURCE_PASSWORD: ${{ secrets.SQL_PASSWORD }}
       run: mvn test
 
     - name: Stop Spring Boot Application
